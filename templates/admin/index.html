@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工一云电脑 应用程序管理员</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'icons/myicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/admin_static.css' %}">
+    <link rel="icon" href="{%  static 'icons/myicon.ico' %}" type="image/x-icon">
+</head>
+<body>
+<header>
+    <nav class="search-nav">
+        <a href="{% url 'admin_index' %}" class="home-button">
+            <img src="{% static 'icons/myicon.png' %}" alt="Home Icon" class="home-icon">
+        </a>
+        <form action="{% url 'search_app' %}" method="GET" class="search-form">
+            <input type="text" name="query" class="search-input" placeholder="Search apps">
+            <button type="submit" class="search-button">搜索</button>
+        </form>
+        <a href="{% url 'logout' %}" class="logout-button">
+            <button class="btn btn-logout">注销</button>
+        </a>
+    </nav>
+
+</header>
+<main class="main-content">
+    <aside class="category-list">
+        <p class="active"><b>应用程序类别</b></p>
+        <a href="{% url 'admin_index' %}" {% if not selected_category %}class="active"{% endif %}>所有程序</a>
+        {% for cat in categories %}
+            <a href="{% url 'admin_by_category' category=cat %}" {% if selected_category == cat %}class="active"{% endif %}>
+                {{ cat }}
+            </a>
+        {% endfor %}
+    </aside>
+    <section class="apps">
+        <h2>
+            {% if selected_category %}
+                {{ selected_category }}程序
+            {% else %}
+                所有程序
+            {% endif %}
+        </h2>
+        <div class="app-grid">
+            {% for app in apps %}
+                <div class="app-link">
+                    <a href="{% url 'edit_app' id=app.id %}" class="app">
+                        <div class="app">
+                            <img src="{{ MEDIA_URL }}{{ app.icon_path }}" alt="{{ app.name }} Icon" class="app-icon">
+
+                            <div class="app-info">
+                                <span class="app-name">{{ app.name }}</span>
+                                <span class="app-category">{{ app.category }}</span> 
+                                <form action="{% url 'delete_app' id=app.id %}" method="POST" style="display:inline;" onsubmit="return confirm('您确定要删除此应用程序吗？');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="delete-button" title="Delete App">
+                                        <svg class="delete-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                            <path  d="M3 6h18v2H3zm2 2h14v12H5zm4 0h4v10h-4zM6 2h12v2H6z"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </a>
+
+
+                </div>
+            {% endfor %}
+            <!-- Add button to add a new application -->
+            <div class="app-link add-app">
+                <a href="{% url 'add_app' %}" class="app">
+                    <div class="app-info">
+                        <span class="app-name">+添加新应用程序</span>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </section>
+</main>
+</body>
+</html>
