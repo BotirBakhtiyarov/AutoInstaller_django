@@ -16,9 +16,12 @@
             <img src="{% static 'icons/myicon.png' %}" alt="Home Icon" class="home-icon">
         </a>
         <form action="{% url 'search_app' %}" method="GET" class="search-form">
-            <input type="text" name="query" class="search-input" placeholder="Search apps">
+            <input type="text" name="query" class="search-input" placeholder="搜索应用程序">
             <button type="submit" class="search-button">搜索</button>
         </form>
+        <a href="{% url 'index' %}" class="logout-button">
+            <button class="btn btn-logout">返回用户模式</button>
+        </a>
         <a href="{% url 'logout' %}" class="logout-button">
             <button class="btn btn-logout">注销</button>
         </a>
