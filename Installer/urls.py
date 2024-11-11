@@ -10,11 +10,13 @@ urlpatterns = [
     path('apps/category/<str:category>/', views.applist, name='applist_by_category'),
     #=============================Admin==========================================
 
-    path('admin/', views.admin_index, name='admin_index'),
-    path('admin/category/<str:category>/', views.admin_index, name='admin_by_category'),
+    path('admin/', views.admin_page, name='admin_page'),
+    path('admin/category/<str:category>/', views.admin_page, name='admin_by_category'),
     path('admin/add/', views.add_app, name='add_app'),
     path('admin/edit/<int:id>/', views.edit_app, name='edit_app'),
     path('admin/delete/<int:id>/', views.delete_app, name='delete_app'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    #=============================Registration================================
+
 ]

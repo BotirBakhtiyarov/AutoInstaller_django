@@ -67,7 +67,7 @@ def install_app(app):
 def login_view(request):
     # If the user is already authenticated, redirect them to the home page or dashboard
     if request.user.is_authenticated:
-        return redirect('admin_index')  # Replace 'home' with your actual home page URL name
+        return redirect('admin_page')  # Replace 'home' with your actual home page URL name
 
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -78,13 +78,13 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, 'Login successful!')
-                return redirect('admin_index')  # Redirect to the home page after successful login
+                return redirect('admin_page')  # Redirect to the home page after successful login
             else:
                 messages.error(request, 'Invalid username or password.')
     else:
         form = LoginForm()
     
-    return render(request, 'admin/login.html', {'form': form})
+    return render(request, 'managers/login.html', {'form': form})
 
 def logout_view(request):
     logout(request)
@@ -92,7 +92,7 @@ def logout_view(request):
     return redirect('login')
 
 @login_required
-def admin_index(request, category=None):
+def admin_page(request, category=None):
     categories = App.objects.values_list('category', flat=True).distinct()
         
         # Filter apps based on selected category, if any
@@ -100,7 +100,7 @@ def admin_index(request, category=None):
         apps = App.objects.filter(category=category)
     else:
         apps = App.objects.all()
-    return render(request, 'admin/index.html', {'apps': apps, 'MEDIA_URL': settings.MEDIA_URL, 'categories': categories, 'selected_category': category,} )
+    return render(request, 'managers/index.html', {'apps': apps, 'MEDIA_URL': settings.MEDIA_URL, 'categories': categories, 'selected_category': category,} )
 
 @login_required
 def add_app(request):
@@ -131,7 +131,7 @@ def add_app(request):
                 return redirect('add_app')
 
             # Render the form with the script files and unzip folder
-            return render(request, 'admin/add_app.html', {
+            return render(request, 'managers/add_app.html', {
                 'files': script_files,
                 'unzip_path': unzip_path,
                 'zip_path': zip_path,
@@ -172,13 +172,13 @@ def add_app(request):
                     app.save()
 
                     messages.success(request, 'App successfully added!')
-                    return redirect('admin_index')
+                    return redirect('admin_page')
             except Exception as e:
                 messages.error(request, f"An error occurred while saving the app: {e}")
         else:
             messages.error(request, "Please fill in all required fields.")
 
-    return render(request, 'admin/add_app.html', {'files': script_files, 'zip_path': zip_path})
+    return render(request, 'managers/add_app.html', {'files': script_files, 'zip_path': zip_path})
 
 @login_required
 def edit_app(request, id):
@@ -255,9 +255,9 @@ def edit_app(request, id):
                 default_storage.delete(full_new_icon_path)
             return redirect(reverse('edit_app', args=[id]))
 
-        return redirect('admin_index')
+        return redirect('admin_page')
 
-    return render(request, 'admin/edit_app.html', {'app': app_record, 'MEDIA_URL': settings.MEDIA_URL})
+    return render(request, 'managers/edit_app.html', {'app': app_record, 'MEDIA_URL': settings.MEDIA_URL})
 
 def custom_secure_filename(name):
     return re.sub(r'[^\w\s.-]', '', name).strip()
@@ -299,7 +299,10 @@ def delete_app(request, id):
         # Delete app from the database
         app_record.delete()
         messages.success(request, 'App successfully deleted!')
-        return redirect('admin_index')  # Replace with your admin index URL name
+        return redirect('admin_page')  # Replace with your admin index URL name
     else:
         messages.error(request, 'Invalid request method.')
-        return redirect('admin_index')
+        return redirect('admin_page')
+
+#================================================Registeration===================================
+
