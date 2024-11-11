@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+        <a href="{% url 'logout' %}" class="logout-button">
+            <button class="btn btn-logout">注销</button>
+        </a>
+<p>Username: {{ profile.user.username }}</p>
+<p>Real Name: {{ profile.real_name }}</p>
+</body>
+</html>

@@ -9,13 +9,15 @@ from django.db import transaction
 from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
-from .forms import LoginForm
+from .forms import LoginForm, UserRegistrationForm, UserProfileForm
+from django.http import HttpResponseForbidden
 
 # Create your views here.
 def index(request):
     apps = App.objects.order_by('?')[:6]
     return render(request, 'user/index.html', {'apps': apps, 'MEDIA_URL': settings.MEDIA_URL})
 
+@login_required
 def applist(request, category=None):
     # Fetch all categories for sidebar
     categories = App.objects.values_list('category', flat=True).distinct()
@@ -33,7 +35,7 @@ def applist(request, category=None):
         'MEDIA_URL': settings.MEDIA_URL
     })
 
-
+@login_required
 def app_detail(request, app_name):
     app = get_object_or_404(App, name=app_name)
     host_url = request.scheme + '://' + request.get_host()
@@ -43,7 +45,7 @@ def app_detail(request, app_name):
                    if file.endswith(('png', 'jpg', 'jpeg', 'gif'))] if os.path.exists(screenshots_folder) else []
     return render(request, 'user/app_detail.html', {'app': app, 'apps': apps, 'screenshots': screenshots, 'MEDIA_URL': settings.MEDIA_URL, 'host_url': host_url})
 
-
+@login_required
 def search_app(request):
     query = request.GET.get('query')
     app = App.objects.filter(name__icontains=query).first()
@@ -52,12 +54,14 @@ def search_app(request):
     messages.error(request, 'App not found')
     return redirect('index')
 
+@login_required
 def install_app_route(request, app_name):
     app = get_object_or_404(App, name=app_name)
     install_app(app)
     messages.success(request, f'Installing {app_name}...')
     return redirect('index')
 
+@login_required
 def install_app(app):
     if app.script:
         subprocess.Popen(['cmd', '/c', 'start', app.script])
@@ -65,9 +69,12 @@ def install_app(app):
 #======================================Admin Panel===============================================================
 
 def login_view(request):
-    # If the user is already authenticated, redirect them to the home page or dashboard
     if request.user.is_authenticated:
-        return redirect('admin_page')  # Replace 'home' with your actual home page URL name
+        # Redirect based on user staff status
+        if request.user.is_staff:
+            return redirect('admin_page')
+        else:
+            return redirect('index')
 
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -78,12 +85,17 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, 'Login successful!')
-                return redirect('admin_page')  # Redirect to the home page after successful login
+
+                # Check if the user is a staff member
+                if user.is_staff:
+                    return redirect('admin_page')  # Redirect staff to admin page
+                else:
+                    return redirect('index')  # Redirect non-staff users to the main index page
             else:
                 messages.error(request, 'Invalid username or password.')
     else:
         form = LoginForm()
-    
+
     return render(request, 'managers/login.html', {'form': form})
 
 def logout_view(request):
@@ -93,8 +105,11 @@ def logout_view(request):
 
 @login_required
 def admin_page(request, category=None):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("back to admin page")
+
     categories = App.objects.values_list('category', flat=True).distinct()
-        
+
         # Filter apps based on selected category, if any
     if category:
         apps = App.objects.filter(category=category)
@@ -306,3 +321,32 @@ def delete_app(request, id):
 
 #================================================Registeration===================================
 
+def register(request):
+    if request.method == 'POST':
+        user_form = UserRegistrationForm(request.POST)
+        profile_form = UserProfileForm(request.POST, request.FILES)
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save(commit=False)
+            user.set_password(user_form.cleaned_data['password'])
+            user.save()
+
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
+
+            messages.success(request, 'Your account has been created! You can now log in.')
+            login(request, user)  # Automatically log in the user after registration
+            return redirect('index')  # Redirect to main page
+    else:
+        user_form = UserRegistrationForm()
+        profile_form = UserProfileForm()
+
+    return render(request, 'user/register.html', {
+        'user_form': user_form,
+        'profile_form': profile_form
+    })
+
+@login_required
+def profile(request):
+    profile = request.user.profile
+    return render(request, 'user/profile.html', {'profile': profile})
