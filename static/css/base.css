@@ -1,0 +1,130 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #272825;
+    color: #ffffff;
+    padding: 14px 156px 321px 156px;
+    align-items: flex-start;
+    margin: 0;
+}
+
+nav input {
+    width: 80%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+/* Style for the navigation bar */
+.search-nav {
+    display: flex;
+    align-items: center; /* Vertically center items */
+    justify-content: center; /* Center items horizontally */
+    margin: 20px 0;
+}
+
+/* Style for the Home button image */
+.home-button {
+    display: inline-block; /* Ensure the image behaves like a block element */
+    margin-right: 20px; /* Space between Home button and the search form */
+}
+
+/* Style for the image inside the Home button */
+.home-icon {
+    width: 150px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+    display: block; /* Ensure the image does not have extra space around it */
+}
+
+/* Style for the search form */
+.search-form {
+    display: flex;
+    align-items: center; /* Vertically center items */
+    width: 100%;
+    max-width: 600px; /* Adjust for the desired width */
+    background-color: #272825;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+/* Input Styling */
+.search-input {
+    flex-grow: 1;
+    padding: 15px 20px;
+    border: none;
+    font-size: 16px;
+    border-radius: 50px 0 0 50px;
+    outline: none;
+    background-color: #6d6d6d;
+    color: #ffffff;
+}
+
+.search-input::placeholder {
+    color: #bbbbbb;
+}
+
+/* Button Styling */
+.search-button {
+    background-color: #00bfff;
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    border-radius: 0 50px 50px 0;
+    transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+    background-color: #008ecc;
+}
+
+/* Add responsive adjustments if necessary */
+@media (max-width: 768px) {
+    .search-form {
+        max-width: 100%;
+    }
+
+    .search-button {
+        padding: 10px;
+    }
+
+    .search-input {
+        padding: 10px;
+    }
+}
+
+.logout-button {
+    margin-left: 20px; /* Space between search form and logout button */
+}
+
+.btn-logout {
+    background-color: #ff6347; /* Tomato color */
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    border-radius: 50px; /* Make it rounded */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+}
+
+.btn-logout:hover {
+    background-color: #e5533f; /* Darker shade on hover */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Larger shadow on hover */
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .btn-logout {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    .logout-button {
+        margin-left: 10px;
+    }
+}

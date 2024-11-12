@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} {% endblock %}</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'icons/myicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+   <header>
+        <nav class="search-nav">
+            <a href="{% url 'index' %}" class="home-button">
+                <img src="{% static 'icons/myicon.png' %}" alt="Home Icon" class="home-icon">
+            </a>
+            <form action="{% url 'search_app' %}" method="GET" class="search-form">
+                <input type="text" name="query" class="search-input" placeholder="搜索应用程序">
+                <button type="submit" class="search-button">搜索</button>
+            </form>
+        </nav>
+    </header>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>

@@ -1,25 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工一云电脑 应用程序列表</title>
-    {% load static %}
-    <link rel="icon" href="{% static 'icons/myicon.ico' %}" type="image/x-icon">
+{% extends "user/base.html" %}
+
+{% block title %}工一云电脑 应用程序列表{% endblock %}
+
+{% block extra_css %}
+{% load static %}
     <link rel="stylesheet" href="{% static 'css/applist_static.css' %}">
-</head>
-<body>
-<header>
-    <nav class="search-nav">
-        <a href="{% url 'index' %}" class="home-button">
-            <img src="{% static 'icons/myicon.png' %}" alt="Home Icon" class="home-icon">
-        </a>
-        <form action="{% url 'search_app' %}" method="GET" class="search-form">
-            <input type="text" name="query" class="search-input" placeholder="搜索应用程序">
-            <button type="submit" class="search-button">搜索</button>
-        </form>
-    </nav>
-</header>
+{% endblock %}
+
+{% block content %}
 
 <main class="main-content">
     <aside class="category-list">
@@ -57,6 +45,4 @@
     </section>
 </main>
 
-<script src="{% static 'js/slider.js' %}"></script>
-</body>
-</html>
+{% endblock %}

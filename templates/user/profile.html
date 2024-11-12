@@ -1,14 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "user/base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<!--   <link rel="stylesheet" href="{% static 'css/app_style.css' %}">-->
+{% endblock %}
+
+{% block content %}
         <a href="{% url 'logout' %}" class="logout-button">
             <button class="btn btn-logout">注销</button>
         </a>
-<p>Username: {{ profile.user.username }}</p>
-<p>Real Name: {{ profile.real_name }}</p>
-</body>
-</html>
+    <p>Username: {{ profile.user.username }}</p>
+    <p>Real Name: {{ profile.real_name }}</p>
+    <p>Password: {{ profile.user.password }}</p>
+    <img src="{{ MEDIA_URL }}{{ profile.profile_picture }}" alt="{{ profile.user.username }}">
+
+{% endblock %}

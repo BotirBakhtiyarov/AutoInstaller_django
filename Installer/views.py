@@ -325,6 +325,7 @@ def register(request):
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
         profile_form = UserProfileForm(request.POST, request.FILES)
+
         if user_form.is_valid() and profile_form.is_valid():
             user = user_form.save(commit=False)
             user.set_password(user_form.cleaned_data['password'])
@@ -341,7 +342,7 @@ def register(request):
         user_form = UserRegistrationForm()
         profile_form = UserProfileForm()
 
-    return render(request, 'user/register.html', {
+    return render(request, 'managers/register.html', {
         'user_form': user_form,
         'profile_form': profile_form
     })
@@ -349,4 +350,4 @@ def register(request):
 @login_required
 def profile(request):
     profile = request.user.profile
-    return render(request, 'user/profile.html', {'profile': profile})
+    return render(request, 'user/profile.html', {'profile': profile,'MEDIA_URL': settings.MEDIA_URL})

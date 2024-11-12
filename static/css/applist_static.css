@@ -1,72 +1,6 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #272825;
-    color: #ffffff;
-    padding: 20px;
-}
-
 .main-content {
     display: flex;
 }
-
-.search-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 0;
-}
-
-.home-button {
-    display: inline-block;
-    margin-right: 20px;
-}
-
-.home-icon {
-    width: 150px;
-    height: auto;
-}
-
-.search-form {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    max-width: 600px;
-    background-color: #272825;
-    border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-}
-
-.search-input {
-    flex-grow: 1;
-    padding: 15px 20px;
-    border: none;
-    font-size: 16px;
-    border-radius: 50px 0 0 50px;
-    outline: none;
-    background-color: #6d6d6d;
-    color: #ffffff;
-}
-
-.search-input::placeholder {
-    color: #bbbbbb;
-}
-
-.search-button {
-    background-color: #00bfff;
-    color: white;
-    border: none;
-    padding: 15px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 0 50px 50px 0;
-    transition: background-color 0.3s ease;
-}
-
-.search-button:hover {
-    background-color: #008ecc;
-}
-
 .category-list {
     width: 200px;
     display: flex;
@@ -152,7 +86,7 @@ body {
     }
 
     .category-list {
-        width: 95%;
+        width: 90%;
         margin-bottom: 20px;
     }
 
@@ -160,11 +94,5 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .search-button {
-        padding: 10px;
-    }
 
-    .search-input {
-        padding: 10px;
-    }
 }

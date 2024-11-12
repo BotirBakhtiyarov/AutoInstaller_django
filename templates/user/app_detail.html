@@ -1,132 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>应用程序详细信息</title>
-    {% load static %}
-    <link rel="icon" href="{% static 'icons/myicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'css/app_style.css' %}">
-    <script>
-        function installApp() {
-            var appName = "{{ app.name }}";
-            var installUrl = "myapp://install/" + encodeURIComponent(appName);
-            window.location.href = installUrl;
-        }
+{% extends "user/base.html" %}
 
-        function openDownloadMenu() {
-        // Show the download menu
-        document.getElementById('downloadMenu').style.display = 'block';
-        }
+{% block title %}应用程序详细信息{% endblock %}
 
-        function closeDownloadMenu() {
-            // Hide the download menu
-            document.getElementById('downloadMenu').style.display = 'none';
-        }
+{% block extra_css %}
+{% load static %}
+   <link rel="stylesheet" href="{% static 'css/app_style.css' %}">
+{% endblock %}
 
-        function downloadZip() {
-            // Trigger download of the ZIP file
-            var zipUrl = "{{ host_url }}{{MEDIA_URL}}{{ app.zip_path }}";
-            window.location.href = zipUrl;
-        }
+{% block content %}
 
-        function copyToClipboard() {
-            var link = document.querySelector(".textlink");
-            link.select();
-            link.setSelectionRange(0, 99999);
-            document.execCommand("copy");
-          }
-    </script>
-    <header>
-        <nav class="search-nav">
-            <a href="{% url 'index' %}" class="home-button">
-                <img src="{% static 'icons/myicon.png'%}" alt="Home Icon" class="home-icon">
-            </a>
-            <form action="{% url 'search_app' %}" method="GET" class="search-form">
-                <input type="text" name="query" class="search-input" placeholder="搜索应用程序">
-                <button type="submit" class="search-button">搜索</button>
-            </form>
-        </nav>
-    </header>
-</head>
-<body>
-    <div class="app-header">
-        <div class="app-icon">
-            <img src="{{ MEDIA_URL }}{{ app.icon_path }}" alt="{{ app.name }}">
-        </div>
-        <div class="app-info">
-            <h1>{{ app.name }}</h1>
-            <p>{{ app.company }}</p>
-            <div class="app-ratings">
-                <span class="category">{{ app.category }}</span>
-            </div>
-            <button id="installButton" onclick="installApp()">安装</button>
-            <button id="downloadButton" onclick="openDownloadMenu()">下载</button>
-         </div>
+<div class="app-header">
+    <div class="app-icon">
+        <img src="{{ MEDIA_URL }}{{ app.icon_path }}" alt="{{ app.name }}">
     </div>
-    <div id="downloadMenu" class="modal1">
-        <div class="modal1-content">
-            <span class="close" onclick="closeDownloadMenu()">&times;</span>
-            <h3>分享文件</h3>
-            
-            <!-- Display the download link with a copy button -->
-            <div class="link-container">
-                <input type="text" class="textlink" value="{{ host_url }}{{MEDIA_URL}}{{ app.zip_path }}" readonly>
-                <button onclick="copyToClipboard()" class="copyButton">复制链接</button>
-            </div>
-    
-            <!-- QR Code -->
-            <div class="qr-code">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.host_url }}/{{ app.zip_path }}" alt="QR Code">
-                <p>扫描二维码</p>
-            </div>
-    
-            <!-- Download button -->
-            <button onclick="downloadZip()" id="downloadzipButton">下载ZIP文件</button>
+    <div class="app-info">
+        <h1>{{ app.name }}</h1>
+        <p>{{ app.company }}</p>
+        <div class="app-ratings">
+            <span class="category">{{ app.category }}</span>
         </div>
+        <button id="installButton" onclick="installApp()">安装</button>
+        <button id="downloadButton" onclick="openDownloadMenu()">下载</button>
+     </div>
+</div>
+<div id="downloadMenu" class="modal1">
+    <div class="modal1-content">
+        <span class="close" onclick="closeDownloadMenu()">&times;</span>
+        <h3>分享文件</h3>
+
+        <!-- Display the download link with a copy button -->
+        <div class="link-container">
+            <input type="text" class="textlink" value="{{ host_url }}{{MEDIA_URL}}{{ app.zip_path }}" readonly>
+            <button onclick="copyToClipboard()" class="copyButton">复制链接</button>
+        </div>
+
+        <!-- QR Code -->
+        <div class="qr-code">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.host_url }}/{{ app.zip_path }}" alt="QR Code">
+            <p>扫描二维码</p>
+        </div>
+
+        <!-- Download button -->
+        <button onclick="downloadZip()" id="downloadzipButton">下载ZIP文件</button>
     </div>
-    <div class="content-container">
-        <!-- Left side content (screenshots and description) -->
-        <div class="main-content">
-            <div class="screenshots">
-                <h2>屏幕截图</h2>
-                <div class="screenshot-list">
-                    {% for screenshot in screenshots %}
-                        <div class="screenshot">
-                            <img src="{{MEDIA_URL}}{{ screenshot }}" alt="Screenshot of {{ app.name }}" onclick="openModal('{{MEDIA_URL}}{{ screenshot }}')">
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-    
-            <!-- Modal for zoomed image -->
-            <div id="imageModal" class="modal" onclick="closeModal()">
-                <span class="close">&times;</span>
-                <img class="modal-content" id="zoomedImage">
-            </div>
-    
-            <div class="app-description">
-                <h2>描述</h2>
-                <p>{{ app.description }}</p>
-            </div>
-        </div>
-    
-        <!-- Right side content (related apps) -->
-        <div class="related-apps">
-            <h2>人们也看到</h2>
-            <ul>
-                {% for app in apps %}
-                    <li>
-                        <a href="{% url 'app_detail' app_name=app.name %}" class="app-link">
-                            <img src="{{ MEDIA_URL }}{{ app.icon_path }}" alt="{{ app.name }}">
-                            <span>{{ app.name }}</span>
-                        </a>
-                    </li>
+</div>
+<div class="content-container">
+    <!-- Left side content (screenshots and description) -->
+    <div class="main-content">
+        <div class="screenshots">
+            <h2>屏幕截图</h2>
+            <div class="screenshot-list">
+                {% for screenshot in screenshots %}
+                    <div class="screenshot">
+                        <img src="{{MEDIA_URL}}{{ screenshot }}" alt="Screenshot of {{ app.name }}" onclick="openModal('{{MEDIA_URL}}{{ screenshot }}')">
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
+        </div>
+
+        <!-- Modal for zoomed image -->
+        <div id="imageModal" class="modal" onclick="closeModal()">
+            <span class="close">&times;</span>
+            <img class="modal-content" id="zoomedImage">
+        </div>
+
+        <div class="app-description">
+            <h2>描述</h2>
+            <p>{{ app.description }}</p>
         </div>
     </div>
- <script src="{% static 'js/img_zoom.js' %}"></script>
-</body>
-</html>
+
+    <!-- Right side content (related apps) -->
+    <div class="related-apps">
+        <h2>人们也看到</h2>
+        <ul>
+            {% for app in apps %}
+                <li>
+                    <a href="{% url 'app_detail' app_name=app.name %}" class="app-link">
+                        <img src="{{ MEDIA_URL }}{{ app.icon_path }}" alt="{{ app.name }}">
+                        <span>{{ app.name }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<script src="{% static 'js/app_detail.js' %}"></script>
+{% endblock %}

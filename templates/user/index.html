@@ -1,60 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工一云电脑 软件安装程序</title>
-    {% load static %}
-    <link rel="icon" href="{% static 'icons/myicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'css/static.css' %}">
-</head>
-<body>
-    <header>
-        <nav class="search-nav">
-            <a href="{% url 'index' %}" class="home-button">
-                <img src="{% static 'icons/myicon.png' %}" alt="Home Icon" class="home-icon">
-            </a>
-            <form action="{% url 'search_app' %}" method="GET" class="search-form">
-                <input type="text" name="query" class="search-input" placeholder="搜索应用程序">
-                <button type="submit" class="search-button">搜索</button>
-            </form>
-        </nav>
-    </header>
+{% extends "user/base.html" %}
 
-    <main>
-      <section class="slider">
-        <div class="slides-container"> <!-- Wrap slides in a container -->
-            <div class="slide">
-                <img src="{% static 'banners/banner1.png' %}">
-            </div>
-            <div class="slide">
-                <img src="{% static 'banners/banner2.png' %}">
-            </div>
+{% block title %}工一云电脑 软件安装程序{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+   <link rel="stylesheet" href="{% static 'css/static.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<main>
+  <section class="slider">
+    <div class="slides-container"> <!-- Wrap slides in a container -->
+        <div class="slide">
+            <img src="{% static 'banners/banner1.png' %}">
+        </div>
+        <div class="slide">
+            <img src="{% static 'banners/banner2.png' %}">
+        </div>
+    </div>
+</section>
+
+    <section class="apps">
+        <h2 class="section-title">
+            <a href="{%url 'applist' %}" class="section-link">所有程序 ></a>
+        </h2>
+
+        <div class="app-grid">
+            {% for app in apps %}
+                <a href="{% url 'app_detail' app_name=app.name %}" class="app-link">
+                    <div class="app">
+                        <img src="{{ MEDIA_URL }}{{ app.icon_path }}" alt="{{ app.name }} Icon" class="app-icon">
+                        <div class="app-info">
+                            <span class="app-name">{{ app.name }}</span>
+                            <span class="app-category">{{app.category}}</span> <!-- Add dynamic category here -->
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
         </div>
     </section>
+</main>
+<script src="{% static 'js/slider.js' %}"></script>
 
-        <section class="apps">
-            <h2 class="section-title">
-                <a href="{%url 'applist' %}" class="section-link">所有程序 ></a>
-            </h2>
-
-            <div class="app-grid">
-                {% for app in apps %}
-                    <a href="{% url 'app_detail' app_name=app.name %}" class="app-link">
-                        <div class="app">
-                            <img src="{{ MEDIA_URL }}{{ app.icon_path }}" alt="{{ app.name }} Icon" class="app-icon">
-                            <div class="app-info">
-                                <span class="app-name">{{ app.name }}</span>
-                                <span class="app-category">{{app.category}}</span> <!-- Add dynamic category here -->
-                            </div>
-                        </div>
-                    </a>
-                {% endfor %}
-            </div>
-        </section>
-    </main>
-    <script src="{% static 'js/slider.js' %}"></script>
-</body>
-</html>
-
-
+{% endblock %}

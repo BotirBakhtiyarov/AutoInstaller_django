@@ -1,11 +1,3 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #272825;
-    color: #000;
-    padding: 14px 156px 321px 156px;
-    margin: 0;
-}
-
 .app-header {
     display: flex;
     background-color: #282828;
@@ -75,6 +67,7 @@ button#installButton:disabled {
 /* Screenshots section */
 .screenshots {
     background-color: rgb(255, 255, 255);
+    color: #000;
     padding: 20px;
     margin:  0;
     width: 95%;
@@ -133,6 +126,7 @@ button#installButton:disabled {
 /* App description section */
 .app-description {
     background-color: white;
+    color: #000;
     padding: 20px;
     margin: 20px 0;
     border-radius: 10px;
@@ -220,120 +214,6 @@ button#installButton:disabled {
     transform: scale(1.1);
 }
 
-
-
-.search-nav {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-}
-
-.search-form {
-    display: flex;
-    width: 100%;
-    max-width: 600px;
-    background-color: #272825;
-    border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-}
-
-.search-input {
-    flex-grow: 1;
-    padding: 15px 20px;
-    border: none;
-    font-size: 16px;
-    border-radius: 50px 0 0 50px;
-    outline: none;
-    background-color: #222222;
-    color: #ffffff;
-}
-
-.search-input::placeholder {
-    color: #bbbbbb;
-}
-
-.search-button {
-    background-color: #00bfff;
-    color: white;
-    border: none;
-    padding: 15px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 0 50px 50px 0;
-    transition: background-color 0.3s ease;
-}
-
-.search-button:hover {
-    background-color: #008ecc;
-}
-
-
-.search-nav {
-    display: flex;
-    align-items: center; /* Vertically center items */
-    justify-content: center; /* Center items horizontally */
-    margin: 20px 0;
-}
-
-/* Style for the Home button image */
-.home-button {
-    display: inline-block; /* Ensure the image behaves like a block element */
-    margin-right: 20px; /* Space between Home button and the search form */
-}
-
-/* Style for the image inside the Home button */
-.home-icon {
-    width: 150px; /* Adjust the width as needed */
-    height: auto; /* Maintain aspect ratio */
-    display: block; /* Ensure the image does not have extra space around it */
-}
-
-/* Style for the search form */
-.search-form {
-    display: flex;
-    align-items: center; /* Vertically center items */
-    width: 100%;
-    max-width: 600px; /* Adjust for the desired width */
-    background-color: #333333;
-    border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-}
-
-/* Input Styling */
-.search-input {
-    flex-grow: 1;
-    padding: 15px 20px;
-    border: none;
-    font-size: 16px;
-    border-radius: 50px 0 0 50px;
-    outline: none;
-    background-color: #6d6d6d;
-    color: #ffffff;
-}
-
-.search-input::placeholder {
-    color: #bbbbbb;
-}
-
-/* Button Styling */
-.search-button {
-    background-color: #00bfff;
-    color: white;
-    border: none;
-    padding: 15px 20px;
-    font-size: 16px;
-    font-family: 'Inter', sans-serif;
-    cursor: pointer;
-    border-radius: 0 50px 50px 0;
-    transition: background-color 0.3s ease;
-}
-
-.search-button:hover {
-    background-color: #008ecc;
-}
-
 .modal1 {
     display: none;
     position: fixed;
@@ -345,6 +225,7 @@ button#installButton:disabled {
     height: 100%;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.5);
+    color: #000;
 }
 
 .modal1-content {
@@ -421,21 +302,3 @@ button#downloadzipButton {
     cursor: pointer;
     border-radius: 5px;
 }
-
-
-/* Add responsive adjustments if necessary */
-@media (max-width: 768px) {
-    .search-form {
-        max-width: 100%;
-    }
-
-    .search-button {
-        padding: 10px;
-    }
-
-    .search-input {
-        padding: 10px;
-    }
-}
-
-
