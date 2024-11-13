@@ -1,70 +1,5 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #272825;
-    color: #ffffff;
-    padding: 20px;
-}
-
 .main-content {
     display: flex;
-}
-
-.search-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 0;
-}
-
-.home-button {
-    display: inline-block;
-    margin-right: 20px;
-}
-
-.home-icon {
-    width: 150px;
-    height: auto;
-}
-
-.search-form {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    max-width: 600px;
-    background-color: #272825;
-    border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    overflow: hidden;
-}
-
-.search-input {
-    flex-grow: 1;
-    padding: 15px 20px;
-    border: none;
-    font-size: 16px;
-    border-radius: 50px 0 0 50px;
-    outline: none;
-    background-color: #6d6d6d;
-    color: #ffffff;
-}
-
-.search-input::placeholder {
-    color: #bbbbbb;
-}
-
-.search-button {
-    background-color: #00bfff;
-    color: white;
-    border: none;
-    padding: 15px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 0 50px 50px 0;
-    transition: background-color 0.3s ease;
-}
-
-.search-button:hover {
-    background-color: #008ecc;
 }
 
 .section-link {
@@ -328,29 +263,6 @@ body {
     fill: white;
 }
 
-.logout-button {
-    margin-left: 20px; /* Space between search form and logout button */
-}
-
-.btn-logout {
-    background-color: #ff6347; /* Tomato color */
-    color: white;
-    border: none;
-    padding: 15px 20px;
-    font-size: 16px;
-    font-family: 'Inter', sans-serif;
-    cursor: pointer;
-    border-radius: 50px; /* Make it rounded */
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Subtle shadow */
-}
-
-.btn-logout:hover {
-    background-color: #e5533f; /* Darker shade on hover */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Larger shadow on hover */
-}
-
-
 @media (max-width: 768px) {
     .main-content {
         flex-direction: column;
@@ -365,11 +277,4 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .search-button {
-        padding: 10px;
-    }
-
-    .search-input {
-        padding: 10px;
-    }
 }

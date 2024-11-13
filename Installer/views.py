@@ -319,6 +319,14 @@ def delete_app(request, id):
         messages.error(request, 'Invalid request method.')
         return redirect('admin_page')
 
+
+def admin_search_app(request):
+    query = request.GET.get('query')
+    app = App.objects.filter(name__icontains=query).first()
+    if app:
+        return redirect('edit_app', id=app.id)
+    messages.error(request, 'App not found')
+    return redirect('admin_page')
 #================================================Registeration===================================
 
 def register(request):

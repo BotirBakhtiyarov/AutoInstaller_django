@@ -1,89 +1,77 @@
-<!-- templates/admin/add_app.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工一云电脑 - 添加应用程序</title>
-    {% load static %}
+{% extends "managers/base.html" %}
+
+{% block title %}工一云电脑 软件安装程序{% endblock %}
+
+{% block extra_css %}
+{% load static %}
     <link rel="stylesheet" href="{% static 'css/admin_static.css' %}">
-    <link rel="icon" href="{% static 'icons/myicon.ico' %}" type="image/x-icon">
-</head>
-<body>
-    <header>
-        <nav class="search-nav">
-            <a href="{% url 'admin_page' %}" class="home-button">
-                <img src="{% static 'icons/myicon.png' %}" alt="Home Icon" class="home-icon">
-            </a>
-            <a href="{% url 'admin_index' %}" class="section-link">查看应用程序列表</a>
-        </nav>
-    </header>
+{% endblock %}
 
-    <main>
-        <section class="form-section">
-            <h2 class="section-title">添加新应用程序</h2>
-            {% if not zip_path %}
-                <!-- Step 1: Upload the zip file -->
-                <form action="{% url 'add_app' %}" method="POST" enctype="multipart/form-data" class="add-app-form">
-                    {% csrf_token %}
-                    <h2>Step 1: Upload Zip File</h2>
-                    <input type="file" name="zipfile" accept=".zip" required>
-                    <button type="submit" class="form-button">Upload and Unzip</button>
-                </form>
-            {% else %}
-                <!-- Step 2: Fill in the rest of the app information -->
-                <form action="{% url 'add_app' %}" method="POST" enctype="multipart/form-data" class="add-app-form">
-                    {% csrf_token %}
+{% block content %}
+<main>
+    <section class="form-section">
+        <h2 class="section-title">添加新应用程序</h2>
+        {% if not zip_path %}
+            <!-- Step 1: Upload the zip file -->
+            <form action="{% url 'add_app' %}" method="POST" enctype="multipart/form-data" class="add-app-form">
+                {% csrf_token %}
+                <h2>Step 1: Upload Zip File</h2>
+                <input type="file" name="zipfile" accept=".zip" required>
+                <button type="submit" class="form-button">Upload and Unzip</button>
+            </form>
+        {% else %}
+            <!-- Step 2: Fill in the rest of the app information -->
+            <form action="{% url 'add_app' %}" method="POST" enctype="multipart/form-data" class="add-app-form">
+                {% csrf_token %}
 
-                    <div class="form-group">
-                        <label for="name">应用程序名称:</label>
-                        <input type="text" id="name" name="name" class="form-input" placeholder="输入应用程序名称" required>
-                    </div>
+                <div class="form-group">
+                    <label for="name">应用程序名称:</label>
+                    <input type="text" id="name" name="name" class="form-input" placeholder="输入应用程序名称" required>
+                </div>
 
-                    <div class="form-group">
-                        <label for="description">描述:</label>
-                        <textarea id="description" name="description" class="form-input" placeholder="输入应用程序描述"></textarea>
-                    </div>
+                <div class="form-group">
+                    <label for="description">描述:</label>
+                    <textarea id="description" name="description" class="form-input" placeholder="输入应用程序描述"></textarea>
+                </div>
 
-                    <input type="hidden" name="zip_path" value="{{ zip_path }}">
-                    <input type="hidden" name="unzip_path" value="{{ unzip_path }}">
+                <input type="hidden" name="zip_path" value="{{ zip_path }}">
+                <input type="hidden" name="unzip_path" value="{{ unzip_path }}">
 
-                    <div class="form-group">
-                        <label for="selected_file">选择脚本文件:</label>
-                        <select name="selected_file" required>
-                            {% for file in files %}
-                                <option value="{{ file }}">{{ file }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="selected_file">选择脚本文件:</label>
+                    <select name="selected_file" required>
+                        {% for file in files %}
+                            <option value="{{ file }}">{{ file }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-                    <div class="form-group">
-                        <label for="app-category">类别:</label>
-                        <select id="category" name="category" class="form-input" required>
-                            <option value="">选择类别</option>
-                            <option value="生产力">生产力</option>
-                            <option value="游戏">游戏</option>
-                            <option value="公用事业">公用事业</option>
-                            <option value="教育类">教育类</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="app-category">类别:</label>
+                    <select id="category" name="category" class="form-input" required>
+                        <option value="">选择类别</option>
+                        <option value="生产力">生产力</option>
+                        <option value="游戏">游戏</option>
+                        <option value="公用事业">公用事业</option>
+                        <option value="教育类">教育类</option>
+                    </select>
+                </div>
 
-                    <div class="form-group">
-                        <label for="icon_path">上传图标：</label>
-                        <input type="file" id="icon_path" name="icon_path" class="form-input-file" accept="image/*" required>
-                    </div>
+                <div class="form-group">
+                    <label for="icon_path">上传图标：</label>
+                    <input type="file" id="icon_path" name="icon_path" class="form-input-file" accept="image/*" required>
+                </div>
 
-                    <div class="form-group">
-                        <label for="screenshots">上传截图：</label>
-                        <input type="file" id="screenshots" name="screenshots" class="form-input-file" accept="image/*" multiple>
-                    </div>
+                <div class="form-group">
+                    <label for="screenshots">上传截图：</label>
+                    <input type="file" id="screenshots" name="screenshots" class="form-input-file" accept="image/*" multiple>
+                </div>
 
-                    <div class="form-group">
-                        <button type="submit" class="form-button">添加应用程序</button>
-                    </div>
-                </form>
-            {% endif %}
-        </section>
-    </main>
-</body>
-</html>
+                <div class="form-group">
+                    <button type="submit" class="form-button">添加应用程序</button>
+                </div>
+            </form>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

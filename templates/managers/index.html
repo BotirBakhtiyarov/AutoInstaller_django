@@ -1,33 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工一云电脑 应用程序管理员</title>
-    {% load static %}
-    <link rel="icon" href="{% static 'icons/myicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'css/admin_static.css' %}">
-    <link rel="icon" href="{%  static 'icons/myicon.ico' %}" type="image/x-icon">
-</head>
-<body>
-<header>
-    <nav class="search-nav">
-        <a href="{% url 'admin_page' %}" class="home-button">
-            <img src="{% static 'icons/myicon.png' %}" alt="Home Icon" class="home-icon">
-        </a>
-        <form action="{% url 'search_app' %}" method="GET" class="search-form">
-            <input type="text" name="query" class="search-input" placeholder="搜索应用程序">
-            <button type="submit" class="search-button">搜索</button>
-        </form>
-        <a href="{% url 'index' %}" class="logout-button">
-            <button class="btn btn-logout">返回用户模式</button>
-        </a>
-        <a href="{% url 'logout' %}" class="logout-button">
-            <button class="btn btn-logout">注销</button>
-        </a>
-    </nav>
+{% extends "managers/base.html" %}
 
-</header>
+{% block title %}工一云电脑 软件安装程序{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+    <link rel="stylesheet" href="{% static 'css/admin_static.css' %}">
+{% endblock %}
+
+{% block content %}
+
 <main class="main-content">
     <aside class="category-list">
         <p class="active"><b>应用程序类别</b></p>
@@ -83,5 +64,5 @@
         </div>
     </section>
 </main>
-</body>
-</html>
+
+{% endblock %}
