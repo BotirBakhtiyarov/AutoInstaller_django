@@ -18,6 +18,24 @@
                 <input type="text" name="query" class="search-input" placeholder="搜索应用程序">
                 <button type="submit" class="search-button">搜索</button>
             </form>
+
+                        <!-- User navigation: aligned with search bar -->
+            <div class="user-nav">
+                {% if user.is_authenticated %}
+                    <div class="profile-dropdown">
+                        <a href="{% url 'profile' %}" class="profile-link">
+                            <img src="{{MEDIA_URL}}{{ user.profile.profile_picture }}" alt="Profile Picture" class="profile-icon">
+                        </a>
+                        <div class="dropdown-content">
+                            <span>username: {{ user.username }}</span>
+                            <span>Real name: {{ user.profile.real_name }}</span>
+                            <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="login-button">Login</a>
+                {% endif %}
+            </div>
         </nav>
     </header>
     {% block content %}
