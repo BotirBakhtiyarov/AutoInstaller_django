@@ -1,15 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
+{% extends "managers/base.html" %}
+
+{% block title %}工一云电脑 软件安装程序{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<!--    <link rel="stylesheet" href="{% static 'css/admin_static.css' %}">-->
+{% endblock %}
+
+{% block content %}
+
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ user_form.as_p }}
     {{ profile_form.as_p }}
     <button type="submit">Register</button>
 </form>
-</body>
-</html>
+
+{% endblock %}

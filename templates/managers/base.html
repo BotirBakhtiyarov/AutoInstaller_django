@@ -21,9 +21,27 @@
             <a href="{% url 'index' %}" class="logout-button">
                 <button class="btn btn-logout">返回用户模式</button>
             </a>
-            <a href="{% url 'logout' %}" class="logout-button">
-                <button class="btn btn-logout">注销</button>
-            </a>
+<!--            <a href="{% url 'logout' %}" class="logout-button">-->
+<!--                <button class="btn btn-logout">注销</button>-->
+<!--            </a>-->
+
+                        <!-- User navigation: aligned with search bar -->
+            <div class="user-nav">
+                {% if user.is_authenticated %}
+                    <div class="profile-dropdown">
+                        <a href="{% url 'profile' %}" class="profile-link">
+                            <img src="{{MEDIA_URL}}{{ user.profile.profile_picture }}" alt="Profile Picture" class="profile-icon">
+                        </a>
+                        <div class="dropdown-content">
+                            <span>username: {{ user.username }}</span><br>
+                            <span>Real name: {{ user.profile.real_name }}</span>
+                            <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="login-button">Login</a>
+                {% endif %}
+            </div>
         </nav>
     </header>
     {% block content %}
