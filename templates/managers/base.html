@@ -33,8 +33,7 @@
                             <img src="{{MEDIA_URL}}{{ user.profile.profile_picture }}" alt="Profile Picture" class="profile-icon">
                         </a>
                         <div class="dropdown-content">
-                            <span>username: {{ user.username }}</span><br>
-                            <span>Real name: {{ user.profile.real_name }}</span>
+                            <span>{{ user.username }}</span><br>
                             <a href="{% url 'logout' %}" class="logout-button">Logout</a>
                         </div>
                     </div>

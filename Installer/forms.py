@@ -30,3 +30,15 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['real_name', 'profile_picture']
+
+class ProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['real_name', 'profile_picture']  # You can add more fields as needed
+
+    # Optional: Customize form fields if needed, e.g., add validation
+    def clean_profile_picture(self):
+        picture = self.cleaned_data.get('profile_picture')
+        if picture and picture.size > 5 * 1024 * 1024:  # Max size 5MB
+            raise forms.ValidationError("Image file too large. Max size is 5MB.")
+        return picture

@@ -9,7 +9,7 @@ from django.db import transaction
 from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
-from .forms import LoginForm, UserRegistrationForm, UserProfileForm
+from .forms import LoginForm, UserRegistrationForm, UserProfileForm, ProfileEditForm
 from django.http import HttpResponseForbidden
 
 # Create your views here.
@@ -359,3 +359,18 @@ def register(request):
 def profile(request):
     profile = request.user.profile
     return render(request, 'user/profile.html', {'profile': profile,'MEDIA_URL': settings.MEDIA_URL})
+
+@login_required
+def profile_edit(request):
+    # Get the user's profile
+    profile = request.user.profile
+
+    if request.method == 'POST':
+        form = ProfileEditForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')  # Redirect to the profile view after saving changes
+    else:
+        form = ProfileEditForm(instance=profile)
+
+    return render(request, 'user/profile_edit.html', {'form': form})

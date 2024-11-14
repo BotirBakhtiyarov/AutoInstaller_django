@@ -3,14 +3,26 @@
 {% block title %}Profile{% endblock %}
 
 {% block extra_css %}
-{% load static %}
-<!--   <link rel="stylesheet" href="{% static 'css/app_style.css' %}">-->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
 {% endblock %}
 
 {% block content %}
-    <p>Username: {{ profile.user.username }}</p>
-    <p>Real Name: {{ profile.real_name }}</p>
-    <p>Password: {{ profile.user.password }}</p>
-    <img src="{{ MEDIA_URL }}{{ profile.profile_picture }}" alt="{{ profile.user.username }}">
+    <div class="profile-container">
+        <div class="profile-header">
+            <img src="{{ MEDIA_URL }}{{ profile.profile_picture }}" alt="{{ profile.user.username }}">
+            <h1>{{ profile.user.username }}</h1>
+        </div>
 
+        <div class="profile-info">
+            <label for="username">Username:</label>
+            <span>{{ profile.user.username }}</span>
+
+            <label for="real_name">Real Name:</label>
+            <span>{{ profile.real_name }}</span>
+
+        </div>
+        <button class="profile-edit-btn" onclick="window.location.href='{% url 'profile_edit' %}'">Edit Profile</button>
+
+    </div>
 {% endblock %}
