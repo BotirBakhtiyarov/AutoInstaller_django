@@ -1,6 +1,6 @@
 {% extends "user/base.html" %}
 
-{% block title %}Profile{% endblock %}
+{% block title %}个人资料{% endblock %}
 
 {% block extra_css %}
     {% load static %}
@@ -15,10 +15,10 @@
         </div>
 
         <div class="profile-info">
-            <label for="username">Username:</label>
+            <label for="username">用户名:</label>
             <span>{{ profile.user.username }}</span>
 
-            <label for="real_name">Real Name:</label>
+            <label for="real_name">真实姓名:</label>
             <span>{{ profile.real_name }}</span>
 
         </div>

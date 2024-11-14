@@ -1,6 +1,6 @@
 {% extends "user/base.html" %}
 
-{% block title %}Edit Profile{% endblock %}
+{% block title %}编辑个人资料{% endblock %}
 
 {% block extra_css %}
     {% load static %}
@@ -14,18 +14,18 @@
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="mb-3">
-                <label for="real_name" class="form-label">Real Name</label>
+                <label for="real_name" class="form-label">真实姓名</label>
                 {{ form.real_name }}
             </div>
             <div class="mb-3">
-                <label for="profile_picture" class="form-label">Profile Picture</label>
+                <label for="profile_picture" class="form-label">个人资料图片</label>
                 {{ form.profile_picture }}
             </div>
              <div class="mb-3">
                 <label for="password">Password:</label>
-                <span>***** <a href="{% url 'password_change' %}">Change Password</a></span>
+                <span>***** <a href="{% url 'password_change' %}">修改密码</a></span>
             </div>
-            <button type="submit" class="btn profile-edit-btn">Save Changes</button>
+            <button type="submit" class="btn profile-edit-btn">保存更改</button>
         </form>
     </div>
 {% endblock %}

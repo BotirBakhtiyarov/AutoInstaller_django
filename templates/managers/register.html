@@ -1,6 +1,6 @@
-{% extends "managers/base.html" %}
+{% extends "managers/login.html" %}
 
-{% block title %}工一云电脑 软件安装程序{% endblock %}
+{% block title %}注册{% endblock %}
 
 {% block extra_css %}
 {% load static %}
@@ -11,9 +11,28 @@
 
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ user_form.as_p }}
-    {{ profile_form.as_p }}
-    <button type="submit">Register</button>
+    <div class="mb-3">
+        <label for="real_name" class="form-label">真实姓名</label>
+        {{ profile_form.real_name }}
+    </div>
+    <div class="mb-3">
+        <label for="profile_picture" class="form-label">个人资料图片</label>
+        {{ profile_form.profile_picture }}
+    </div>
+    <div class="mb-3">
+        <label for="username" class="form-label">用户名</label>
+        {{ user_form.username }}
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">密码</label>
+        {{ user_form.password }}
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">确认密码</label>
+        {{ user_form.password_confirm }}
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">注册</button>
 </form>
 
 {% endblock %}

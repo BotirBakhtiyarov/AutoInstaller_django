@@ -9,7 +9,7 @@ from django.db import transaction
 from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
-from .forms import LoginForm, UserRegistrationForm, UserProfileForm, ProfileEditForm
+from .forms import LoginForm, UserRegistrationForm, UserProfileForm, ProfileEditForm, CustomPasswordChangeForm
 from django.http import HttpResponseForbidden
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -380,16 +380,15 @@ def profile_edit(request):
 @login_required
 def change_password(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(user=request.user, data=request.POST)
+        form = CustomPasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
             form.save()
-            # Update session to keep the user logged in
             update_session_auth_hash(request, form.user)
             messages.success(request, 'Your password was successfully updated!')
             return redirect('profile_edit')
         else:
             messages.error(request, 'Please correct the error below.')
     else:
-        form = PasswordChangeForm(user=request.user)
+        form = CustomPasswordChangeForm(user=request.user)
 
     return render(request, 'managers/password_change_form.html', {'form': form})
