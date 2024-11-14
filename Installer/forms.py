@@ -31,10 +31,17 @@ class UserProfileForm(forms.ModelForm):
         model = Profile
         fields = ['real_name', 'profile_picture']
 
+
 class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['real_name', 'profile_picture']  # You can add more fields as needed
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Correctly update widget attributes using the `update` method
+        self.fields['real_name'].widget.attrs.update({'class': 'form-control'})
+        self.fields['profile_picture'].widget.attrs.update({'class': 'form-control-file'})
 
     # Optional: Customize form fields if needed, e.g., add validation
     def clean_profile_picture(self):

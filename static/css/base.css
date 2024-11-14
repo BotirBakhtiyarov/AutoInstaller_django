@@ -141,6 +141,18 @@ nav input {
     border-radius: 50px; /* Make it rounded */
     color: white;
 }
+.admin-button {
+    background-color: #007bff; /* Tomato color */
+    color: white;
+    border: none;
+    color: #333;
+    text-decoration: none;
+    margin: 10px;
+    padding: 8px;
+    display: block;
+    border-radius: 50px; /* Make it rounded */
+    color: white;
+}
 
 
 /* User navigation */

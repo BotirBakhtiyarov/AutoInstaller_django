@@ -2,13 +2,30 @@
 
 {% block title %}Edit Profile{% endblock %}
 
+{% block extra_css %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+
 {% block content %}
-    <div class="profile-edit-container">
+    <div class="profile-container">
         <h2>Edit Your Profile</h2>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <div class="mb-3">
+                <label for="real_name" class="form-label">Real Name</label>
+                {{ form.real_name }}
+            </div>
+            <div class="mb-3">
+                <label for="profile_picture" class="form-label">Profile Picture</label>
+                {{ form.profile_picture }}
+            </div>
+             <div class="mb-3">
+                <label for="password">Password:</label>
+                <span>***** <a href="{% url 'password_change' %}">Change Password</a></span>
+            </div>
+            <button type="submit" class="btn profile-edit-btn">Save Changes</button>
         </form>
     </div>
 {% endblock %}

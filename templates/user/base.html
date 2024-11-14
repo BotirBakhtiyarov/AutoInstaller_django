@@ -28,6 +28,9 @@
                         </a>
                         <div class="dropdown-content">
                             <span>{{ user.username }}</span><br>
+                            {% if user.is_staff %}
+                                <a href="{% url 'admin_page' %}" class="admin-button">Admin</a>
+                            {% endif %}
                             <a href="{% url 'logout' %}" class="logout-button">Logout</a>
                         </div>
                     </div>

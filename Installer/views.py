@@ -11,6 +11,8 @@ from django.urls import reverse
 from django.utils.text import slugify
 from .forms import LoginForm, UserRegistrationForm, UserProfileForm, ProfileEditForm
 from django.http import HttpResponseForbidden
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
 # Create your views here.
 def index(request):
@@ -373,4 +375,21 @@ def profile_edit(request):
     else:
         form = ProfileEditForm(instance=profile)
 
-    return render(request, 'user/profile_edit.html', {'form': form})
+    return render(request, 'user/profile_edit.html', {'form': form, 'MEDIA_URL': settings.MEDIA_URL})
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            # Update session to keep the user logged in
+            update_session_auth_hash(request, form.user)
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('profile_edit')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(user=request.user)
+
+    return render(request, 'managers/password_change_form.html', {'form': form})
