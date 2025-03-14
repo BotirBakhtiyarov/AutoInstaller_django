@@ -12,5 +12,6 @@ urlpatterns = [
     path('payment/<int:app_id>/', views.payment_view, name='payment'),
     path('payment/notify/', views.payment_notify, name='payment_notify'),
     path('payment/status/<str:transaction_id>/', views.check_payment_status, name='check_payment_status'),
+    path('api/install/<str:app_name>/', views.api_install_app, name='api_install_app'),
 ]
 

@@ -19,6 +19,8 @@ from urllib.parse import urlparse
 import hashlib
 from xml.etree import ElementTree as ET
 from django.contrib.auth.decorators import login_required
+from rest_framework.decorators import api_view, permission_classes
+import logging
 
 # Helper Functions for WeChat Pay
 def generate_nonce_str(length=32):
@@ -241,3 +243,50 @@ def check_payment_status(request, transaction_id):
         return JsonResponse({'error': 'Transaction not found'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+logger = logging.getLogger(__name__)
+@api_view(['POST'])  # Use POST to trigger an action
+def api_install_app(request, app_name):
+    """
+    API endpoint to trigger the installation script for an app.
+    URL: /api/install/<app_name>/
+    Method: POST
+    Headers: Authorization: Token <token> (if authenticated)
+    """
+    try:
+        # Fetch the app
+        app = get_object_or_404(App, name=app_name)
+
+        # Check if script exists
+        script_path = app.script  # Assumes script is a full path (e.g., /srv/AutoInstaller/unzipped/<app_name>/install.bat)
+        if not script_path or not os.path.exists(script_path):
+            logger.error(f"Script not found for app {app_name}: {script_path}")
+            return JsonResponse({'error': 'Installation script not found'}, status=404)
+
+        # Log the attempt
+        logger.info(f"Starting installation for app {app_name} with script {script_path}")
+
+        # Execute the script
+        if os.name == 'nt':  # Windows
+            result = subprocess.run([script_path], shell=True, capture_output=True, text=True)
+        else:  # Linux/Mac (Docker)
+            result = subprocess.run(['bash', script_path], capture_output=True, text=True)
+
+        # Check execution result
+        if result.returncode == 0:
+            logger.info(f"Script executed successfully for app {app_name}: {result.stdout}")
+            return JsonResponse({
+                'status': 'success',
+                'message': f"Installation started for {app_name}",
+                'output': result.stdout
+            })
+        else:
+            logger.error(f"Script failed for app {app_name}: {result.stderr}")
+            return JsonResponse({
+                'error': 'Script execution failed',
+                'details': result.stderr
+            }, status=500)
+
+    except Exception as e:
+        logger.error(f"API install failed for app {app_name}: {str(e)}", exc_info=True)
+        return JsonResponse({'error': 'Internal server error'}, status=500)
