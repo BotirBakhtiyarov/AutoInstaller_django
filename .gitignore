@@ -1,4 +1,29 @@
-.venv
-venv
-.idea
-/media
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Ignore virtual environment directory
+venv/
+.venv/
+
+# Ignore database files
+*.sqlite3
+
+# Ignore local configuration files
+.env
+.env.*
+
+# Ignore static files if using Django
+staticfiles/
+media/
+
+# Ignore IDE configuration files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ignore Docker files
+Dockerfile
+docker-compose.yml

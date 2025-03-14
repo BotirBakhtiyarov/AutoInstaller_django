@@ -5,24 +5,192 @@
 {% block extra_css %}
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <style>
+        .profile-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-header img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ddd;
+            margin-bottom: 15px;
+        }
+
+        .profile-header h1 {
+            font-size: 28px;
+            color: #333;
+            margin: 0;
+        }
+
+        .profile-info {
+            padding: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .profile-info label {
+            font-weight: bold;
+            color: #555;
+            width: 120px;
+            margin-right: 10px;
+        }
+
+        .profile-info span {
+            color: #333;
+            font-size: 16px;
+            flex: 1;
+        }
+
+        .profile-edit-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: background-color 0.3s;
+        }
+
+        .profile-edit-btn:hover {
+            background-color: #45a049;
+        }
+
+        .purchased-apps {
+            margin-top: 30px;
+        }
+
+        .purchased-apps h2 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+        }
+
+        .app-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .app-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .app-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .app-item img {
+            width: 60px;
+            height: 60px;
+            border-radius: 5px;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+
+        .app-item h4 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .app-item p {
+            margin: 5px 0 0;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .no-purchases {
+            text-align: center;
+            color: #888;
+            font-size: 16px;
+            padding: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .profile-info {
+                flex-direction: column;
+            }
+
+            .profile-info label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .app-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .app-item img {
+                margin: 0 0 10px 0;
+            }
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
     <div class="profile-container">
         <div class="profile-header">
-            <img src="{{ MEDIA_URL }}{{ profile.profile_picture }}" alt="{{ profile.user.username }}">
-            <h1>{{ profile.user.username }}</h1>
+            <img src="{{ MEDIA_URL }}{{ profile.profile_picture }}" alt="{{ profile.user.username }}的头像">
+            <h1>{{ profile.real_name|default:profile.user.username }}</h1>
         </div>
 
         <div class="profile-info">
-            <label for="username">用户名:</label>
+            <label>用户名:</label>
             <span>{{ profile.user.username }}</span>
 
-            <label for="real_name">真实姓名:</label>
-            <span>{{ profile.real_name }}</span>
+            <label>真实姓名:</label>
+            <span>{{ profile.real_name|default:"未设置" }}</span>
 
+            <label>邮箱:</label>
+            <span>{{ profile.user.email|default:"未设置" }}</span>
         </div>
-        <button class="profile-edit-btn" onclick="window.location.href='{% url 'profile_edit' %}'">Edit Profile</button>
 
+        <button class="profile-edit-btn" onclick="window.location.href='{% url 'profile_edit' %}'">编辑个人资料</button>
+
+        <div class="purchased-apps">
+            <h2>已购买的应用</h2>
+            {% if purchased_apps %}
+                <ul class="app-list">
+                    {% for purchase in purchased_apps %}
+                        <a href="{% url 'app_detail' app_name=purchase.app.name %}" class="app-item">
+                            <img src="{{ MEDIA_URL }}{{ purchase.app.icon_path }}" alt="{{ purchase.app.name }}">
+                            <div>
+                                <h4>{{ purchase.app.name }}</h4>
+                                <p>{{ purchase.app.category }}</p>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="no-purchases">您尚未购买任何应用。</p>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

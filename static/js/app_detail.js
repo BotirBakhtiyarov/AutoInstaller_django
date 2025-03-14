@@ -10,28 +10,28 @@ function closeModal() {
     modal.style.display = "none";
 }
 
+function downloadZip() {
+    // Trigger download of the ZIP file
+    var zipUrl = document.getElementById('zip-url').value;
+    zipUrl = zipUrl.replace('http://', 'https://');
+    window.location.href = zipUrl;
+    console.log('ZIP URL: ',zipUrl)
+}
 
-// DOWNLOAD
 function installApp() {
-    var appName = "{{ app.name }}";
-    var installUrl = "myapp://install/" + encodeURIComponent(appName);
+    var appName = document.getElementById('app-name').value;
+    var installUrl = "myapp://install/" + appName;
     window.location.href = installUrl;
 }
 
 function openDownloadMenu() {
     // Show the download menu
-    document.getElementById('downloadMenu').style.display = 'block';
-}
+        document.getElementById('downloadMenu').style.display = 'block';
+    }
 
 function closeDownloadMenu() {
     // Hide the download menu
     document.getElementById('downloadMenu').style.display = 'none';
-}
-
-function downloadZip() {
-    // Trigger download of the ZIP file
-    var zipUrl = "{{ host_url }}{{MEDIA_URL}}{{ app.zip_path }}";
-    window.location.href = zipUrl;
 }
 
 function copyToClipboard() {

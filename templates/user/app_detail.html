@@ -4,10 +4,100 @@
 
 {% block extra_css %}
 {% load static %}
-   <link rel="stylesheet" href="{% static 'css/app_style.css' %}">
+<link rel="stylesheet" href="{% static 'css/app_style.css' %}">
+<style>
+    /* Payment Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        width: 300px;
+        text-align: center;
+        border-radius: 8px;
+        position: relative;
+        color: black;
+    }
+
+    .close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        cursor: pointer;
+        font-size: 24px;
+        color: #333;
+    }
+
+    .close:hover {
+        color: #000;
+    }
+
+    #qrCodeContainer img {
+        width: 100%;
+        height: auto;
+        margin: 10px 0;
+    }
+
+    /* Button Styles */
+    #payButton, #downloadButton, #installButton {
+        padding: 10px 20pxisticated;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+    }
+
+    #payButton {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    #payButton:hover {
+        background-color: #45a049;
+    }
+
+    #downloadButton, #installButton {
+        background-color: #008CBA;
+        color: white;
+    }
+
+    #downloadButton:disabled, #installButton:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    #downloadButton:hover:not(:disabled), #installButton:hover:not(:disabled) {
+        background-color: #007B9E;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
+
+<!-- Hidden inputs to pass data to JavaScript -->
+<input type="hidden" id="zip-url" value="{{ host_url }}{{ MEDIA_URL }}{{ app.zip_path }}" />
+<input type="hidden" id="app-name" value="{{ app.name }}" />
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closePaymentModal()">×</span>
+        <h3>微信支付</h3>
+        <div id="qrCodeContainer"></div>
+        <p>请使用微信扫描二维码完成支付</p>
+    </div>
+</div>
 
 <div class="app-header">
     <div class="app-icon">
@@ -19,31 +109,23 @@
         <div class="app-ratings">
             <span class="category">{{ app.category }}</span>
         </div>
-        <button id="installButton" onclick="installApp()">安装</button>
-        <button id="downloadButton" onclick="openDownloadMenu()">下载</button>
-     </div>
-</div>
-<div id="downloadMenu" class="modal1">
-    <div class="modal1-content">
-        <span class="close" onclick="closeDownloadMenu()">&times;</span>
-        <h3>分享文件</h3>
 
-        <!-- Display the download link with a copy button -->
-        <div class="link-container">
-            <input type="text" class="textlink" value="{{ host_url }}{{MEDIA_URL}}{{ app.zip_path }}" readonly>
-            <button onclick="copyToClipboard()" class="copyButton">复制链接</button>
-        </div>
-
-        <!-- QR Code -->
-        <div class="qr-code">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.host_url }}/{{ app.zip_path }}" alt="QR Code">
-            <p>扫描二维码</p>
-        </div>
-
-        <!-- Download button -->
-        <button onclick="downloadZip()" id="downloadzipButton">下载ZIP文件</button>
+        <!-- Payment and Download Buttons -->
+        {% if app.price > 0 %}
+            {% if purchased %}
+                <button id="downloadButton">下载</button>
+                <button id="installButton" onclick="installApp()">安装</button>
+            {% else %}
+                <button onclick="initiatePayment({{ app.id }})" id="payButton">立即支付 ¥{{ app.price }}</button>
+                <button id="downloadButton" disabled>下载</button>
+            {% endif %}
+        {% else %}
+            <button id="downloadButton">下载</button>
+            <button id="installButton" onclick="installApp()">安装</button>
+        {% endif %}
     </div>
 </div>
+
 <div class="content-container">
     <!-- Left side content (screenshots and description) -->
     <div class="main-content">
@@ -52,7 +134,9 @@
             <div class="screenshot-list">
                 {% for screenshot in screenshots %}
                     <div class="screenshot">
-                        <img src="{{MEDIA_URL}}{{ screenshot }}" alt="Screenshot of {{ app.name }}" onclick="openModal('{{MEDIA_URL}}{{ screenshot }}')">
+                        <img src="{{ MEDIA_URL }}{{ screenshot }}"
+                             alt="Screenshot of {{ app.name }}"
+                             onclick="openModal(this.src)">
                     </div>
                 {% endfor %}
             </div>
@@ -60,7 +144,7 @@
 
         <!-- Modal for zoomed image -->
         <div id="imageModal" class="modal" onclick="closeModal()">
-            <span class="close">&times;</span>
+            <span class="close">×</span>
             <img class="modal-content" id="zoomedImage">
         </div>
 
@@ -85,5 +169,122 @@
         </ul>
     </div>
 </div>
-<script src="{% static 'js/app_detail.js' %}"></script>
+
+<script>
+    function initiatePayment(appId) {
+        fetch(`/payment/${appId}/`, { credentials: 'include' })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+                throw new Error('Redirected to login');
+            }
+            if (!response.ok) throw new Error('Payment initiation failed');
+            return response.json();
+        })
+        .then(data => {
+            if (data.qr_code_url && data.transaction_id) {
+                showQRCode(data.qr_code_url);
+                monitorPayment(data.transaction_id);
+            } else {
+                alert('支付初始化失败: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (error.message !== 'Redirected to login') {
+                alert('支付请求失败: ' + error.message);
+            }
+        });
+    }
+
+    function showQRCode(url) {
+        document.getElementById('qrCodeContainer').innerHTML = `
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}"
+                 alt="WeChat Pay QR Code">
+        `;
+        document.getElementById('paymentModal').style.display = 'block';
+    }
+
+    function monitorPayment(transactionId) {
+        const checkInterval = setInterval(() => {
+            fetch(`/payment/status/${transactionId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        clearInterval(checkInterval);
+                        document.getElementById('paymentModal').style.display = 'none';
+                        // Reload the page after successful payment
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Payment status check failed:', error);
+                });
+        }, 3000);
+    }
+
+    function fetchZipUrl() {
+        const appName = document.getElementById('app-name').value;
+        fetch(`/install/${appName}/`)
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch ZIP URL');
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success' && data.zip_url) {
+                    document.getElementById('zip-url').value = data.zip_url;
+                } else {
+                    alert('获取下载链接失败: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching ZIP URL:', error);
+                alert('获取下载链接失败: ' + error.message);
+            });
+    }
+
+    function downloadZip() {
+        var zipUrl = document.getElementById('zip-url').value;
+        if (!zipUrl) {
+            alert('No ZIP URL available. Please complete payment first.');
+            return;
+        }
+        if (window.location.protocol === 'http:') {
+            zipUrl = zipUrl.replace('https://', 'http://');
+        }
+        window.location.href = zipUrl;
+    }
+
+    function closePaymentModal() {
+        document.getElementById('paymentModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target === document.getElementById('paymentModal')) {
+            closePaymentModal();
+        } else if (event.target === document.getElementById('imageModal')) {
+            closeModal();
+        }
+    };
+
+    function openModal(imageSrc) {
+        var modal = document.getElementById("imageModal");
+        var modalImg = document.getElementById("zoomedImage");
+        modal.style.display = "block";
+        modalImg.src = imageSrc;
+    }
+
+    function closeModal() {
+        var modal = document.getElementById("imageModal");
+        modal.style.display = "none";
+    }
+
+    function installApp() {
+        var appName = document.getElementById('app-name').value;
+        var installUrl = "myapp://install/" + appName;
+        window.location.href = installUrl;
+    }
+
+    document.getElementById('downloadButton').addEventListener('click', downloadZip);
+</script>
 {% endblock %}

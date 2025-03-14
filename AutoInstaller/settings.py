@@ -11,24 +11,41 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import psycopg2
+from dotenv import load_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+dotenv_path = BASE_DIR / '.env'
 
+# Load environment variables from the .env file
+load_dotenv(dotenv_path=dotenv_path)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-nsy6kls=)wyopx^w&+w0jlv1!-2*fg)64vdb4h5&9ctrgkmcsz'
-
+SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = []
+# Main Variables for Payment
+
+MCH_ID = os.getenv('MCH_ID')
+APP_ID = os.getenv('APP_ID')
+API_KEY = os.getenv('API_KEY')
+KEY_PATH = os.getenv('KEY_PATH')
+
+
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://apps.cec.cc',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -37,9 +54,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Installer',
+    'Installer.apps.InstallerConfig',
     'django_extensions',
+    'Management.apps.ManagementConfig',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Restricts other APIs to authenticated users
+    ],
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -77,8 +107,12 @@ WSGI_APPLICATION = 'AutoInstaller.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASS'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
@@ -117,18 +151,21 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [str(BASE_DIR / "static")]
-
-# If you have other path settings like MEDIA_ROOT or STATIC_ROOT
-STATIC_ROOT = str(BASE_DIR / "staticfiles")
-MEDIA_ROOT = str(BASE_DIR / "media")
+STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-LOGIN_REDIRECT_URL = 'admin_index'  # Name of the URL to redirect to after login
+STATICFILES_DIRS = [
+    str(BASE_DIR.joinpath('static')) 
+]
+STATIC_ROOT = str(BASE_DIR.joinpath('staticfiles'))
+# If you have other path settings like MEDIA_ROOT or STATIC_ROOT
+MEDIA_ROOT = str(BASE_DIR.joinpath('media'))
+
+LOGIN_REDIRECT_URL = '/management/admin/'  # Name of the URL to redirect to after login
 
 # Redirect if the user tries to access a login-required page
-LOGIN_URL = 'login'
+LOGIN_URL = '/management/login/'
+LOGOUT_REDIRECT_URL = '/management/login/'
 
 
 # Default primary key field type

@@ -58,6 +58,11 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="price">价格 (¥):</label>
+                    <input type="number" id="price" name="price" class="form-input" placeholder="输入应用价格" step="0.01" min="0" value="{{ price|default:'0.00' }}">
+                </div>
+
+                <div class="form-group">
                     <label for="icon_path">上传图标：</label>
                     <input type="file" id="icon_path" name="icon_path" class="form-input-file" accept="image/*" required>
                 </div>
