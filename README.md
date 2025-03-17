@@ -257,6 +257,11 @@ AutoInstaller_for-company/
 
 ---
 
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+---
 ## Contributing
 
 1. Fork the repo.
