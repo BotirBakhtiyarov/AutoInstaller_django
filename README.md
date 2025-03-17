@@ -3,7 +3,6 @@
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![Django](https://img.shields.io/badge/Django-4.2.20-green)
 ![Docker](https://img.shields.io/badge/Docker-Compose-blue)
-![License](https://img.shields.io/badge/License-MIT-yellow)
 
 **AutoInstaller** is a Django-based web application designed to manage and install software applications. It features a frontend for browsing and purchasing apps with WeChat payment integration, an admin interface for app management, and an API to trigger installations programmatically. On Windows, installations are executed via a custom protocol (`myapp://`) handled by `LocalApp.exe`, which can be triggered from the frontend or a command-line batch file.
 
