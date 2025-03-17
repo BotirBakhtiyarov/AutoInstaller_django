@@ -20,6 +20,7 @@ import hashlib
 from xml.etree import ElementTree as ET
 from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view, permission_classes
+from django.http import Http404
 import logging
 
 # Helper Functions for WeChat Pay
@@ -244,49 +245,39 @@ def check_payment_status(request, transaction_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+
 logger = logging.getLogger(__name__)
-@api_view(['POST'])  # Use POST to trigger an action
+
+
+@api_view(['POST'])
+@permission_classes([])  # No authentication required
 def api_install_app(request, app_name):
     """
-    API endpoint to trigger the installation script for an app.
+    API endpoint to trigger app installation by returning a custom URL.
     URL: /api/install/<app_name>/
     Method: POST
-    Headers: Authorization: Token <token> (if authenticated)
+    Headers: None required (public access)
+    Returns: JSON with install_url (myapp://install/<app_name>) or error
     """
     try:
-        # Fetch the app
+        logger.info(f"Received request to install app: {app_name}")
+
+        # Fetch the app, raising Http404 if not found
         app = get_object_or_404(App, name=app_name)
 
-        # Check if script exists
-        script_path = app.script  # Assumes script is a full path (e.g., /srv/AutoInstaller/unzipped/<app_name>/install.bat)
-        if not script_path or not os.path.exists(script_path):
-            logger.error(f"Script not found for app {app_name}: {script_path}")
-            return JsonResponse({'error': 'Installation script not found'}, status=404)
+        # Construct the custom install URL
+        install_url = f"myapp://install/{app_name}"
 
-        # Log the attempt
-        logger.info(f"Starting installation for app {app_name} with script {script_path}")
+        logger.info(f"Returning install URL for {app_name}: {install_url}")
+        return JsonResponse({
+            'status': 'success',
+            'app_name': app_name,
+            'install_url': install_url
+        })
 
-        # Execute the script
-        if os.name == 'nt':  # Windows
-            result = subprocess.run([script_path], shell=True, capture_output=True, text=True)
-        else:  # Linux/Mac (Docker)
-            result = subprocess.run(['bash', script_path], capture_output=True, text=True)
-
-        # Check execution result
-        if result.returncode == 0:
-            logger.info(f"Script executed successfully for app {app_name}: {result.stdout}")
-            return JsonResponse({
-                'status': 'success',
-                'message': f"Installation started for {app_name}",
-                'output': result.stdout
-            })
-        else:
-            logger.error(f"Script failed for app {app_name}: {result.stderr}")
-            return JsonResponse({
-                'error': 'Script execution failed',
-                'details': result.stderr
-            }, status=500)
-
+    except Http404:
+        logger.error(f"App not found in database: {app_name}")
+        return JsonResponse({'error': f"App '{app_name}' not found"}, status=404)
     except Exception as e:
         logger.error(f"API install failed for app {app_name}: {str(e)}", exc_info=True)
         return JsonResponse({'error': 'Internal server error'}, status=500)

@@ -3,18 +3,19 @@
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![Django](https://img.shields.io/badge/Django-4.2.20-green)
 ![Docker](https://img.shields.io/badge/Docker-Compose-blue)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
-**AutoInstaller** is a Django-based web application designed to manage, purchase, and automatically install software applications. It features a user-friendly frontend for browsing apps, WeChat payment integration for purchases, and a RESTful API to trigger installation scripts programmatically. The project supports both local development and Docker deployment.
+**AutoInstaller** is a Django-based web application designed to manage and install software applications. It features a frontend for browsing and purchasing apps with WeChat payment integration, an admin interface for app management, and an API to trigger installations programmatically. On Windows, installations are executed via a custom protocol (`myapp://`) handled by `LocalApp.exe`, which can be triggered from the frontend or a command-line batch file.
 
 ---
 
 ## Features
 
-- **App Management**: Admins can upload apps with ZIP files, icons, screenshots, and installation scripts via a management interface.
+- **App Management**: Admins can upload apps with ZIP files, icons, screenshots, and installation scripts via `/management/admin/`.
 - **WeChat Payment**: Users can purchase paid apps using WeChat QR code payments.
-- **Automatic Installation**: Trigger installation scripts stored in app records via a web interface or API.
-- **API Access**: RESTful endpoint to initiate installations without the frontend.
-- **Docker Support**: Deploy the app with Docker Compose for consistent environments.
+- **Frontend Installation**: Click "安装" (Install) to trigger app installation via a custom protocol.
+- **API Installation**: Use `install_app <app_name>` in CMD to trigger installations via the API and `LocalApp.exe`.
+- **Docker Support**: Deploy the server with Docker Compose.
 
 ---
 
@@ -22,23 +23,23 @@
 
 ```
 AutoInstaller_for-company/
-├── .env              # Environment variables (e.g., WeChat credentials)
+├── .env              # Environment variables (DB, WeChat credentials)
 ├── AutoInstaller/
 │   ├── settings.py   # Django settings with .env integration
 │   ├── urls.py      # Root URL configuration
-│   ├── Wechat_cert/ # Directory for WeChat certificates
-│   │   ├── cert.pem
-│   │   └── key.pem
 │   └── ...
 ├── Installer/        # App for user-facing features
-│   ├── models.py    # App and UserPurchase models
-│   ├── views.py     # Views including payment and API
-│   ├── urls.py      # App-specific URL routes
-│   └── ...
-├── Management/       # App for admin management
+│   ├── models.py    # App model
+│   ├── views.py     # API and payment views
+│   ├── urls.py      # App-specific routes
+│   └── templates/   # Frontend templates
+│       └── app_detail.html
+├── Management/       # Admin management app
 ├── docker-compose.yml # Docker Compose configuration
 ├── Dockerfile        # Docker image definition
 ├── requirements.txt  # Python dependencies
+├── install_app.bat   # Batch file for API-triggered installs
+├── LocalApp.exe      # Compiled installer (Windows)
 └── README.md         # This file
 ```
 
@@ -46,16 +47,22 @@ AutoInstaller_for-company/
 
 ## Prerequisites
 
-- Python 3.10+
-- Docker (optional, for containerized deployment)
-- PostgreSQL (optional, replace SQLite if desired)
-- WeChat Merchant Account (for payment integration)
+- **Server**:
+  - Python 3.10+
+  - Docker (optional, for containerized deployment)
+  - PostgreSQL (running on `db-host`)
+  - WeChat Merchant Account (for payments)
+
+- **Client (Windows)**:
+  - `LocalApp.exe` in `C:\localapp\`
+  - `install_app.bat` in PATH (e.g., `C:\Users\<username>\` or `C:\Windows\System32`)
+  - Network access to `\\localhost\apps\` for installers
 
 ---
 
 ## Installation
 
-### Local Setup
+### Server Setup
 
 1. **Clone the Repository**
    ```bash
@@ -74,13 +81,19 @@ AutoInstaller_for-company/
    pip install -r requirements.txt
    ```
 
-4. **Set Up Environment Variables**
-   Create a `.env` file in the project root:
+4. **Set Up `.env`**
+   Create `.env` in the project root:
    ```env
    SECRET_KEY=your-secret-key-here
    DEBUG=True
-   DATABASE_NAME=db.sqlite3
    ALLOWED_HOSTS=localhost,127.0.0.1
+
+   # Database settings
+   DB_NAME=app_database
+   DB_USER=admin
+   DB_PASSWORD=admin
+   DB_HOST=host
+   DB_PORT=5432
 
    # WeChat Payment Settings
    WECHAT_APP_ID=your-app-id
@@ -89,8 +102,6 @@ AutoInstaller_for-company/
    WECHAT_MCH_CERT=Wechat_cert/cert.pem
    WECHAT_MCH_KEY=Wechat_cert/key.pem
    ```
-   - Replace values with your own (e.g., WeChat credentials).
-   - Ensure `Wechat_cert/cert.pem` and `Wechat_cert/key.pem` exist in `AutoInstaller/Wechat_cert/`.
 
 5. **Apply Migrations**
    ```bash
@@ -108,163 +119,148 @@ AutoInstaller_for-company/
    ```
    - Access at `http://localhost:8000/`.
 
----
-
-### Docker Setup
-
-1. **Ensure Docker is Installed**
-   - Install [Docker Desktop](https://www.docker.com/products/docker-desktop) or Docker CLI.
-
-2. **Configure `.env`**
-   - Use the same `.env` file as above.
-
-3. **Build and Run**
+#### Docker Setup
+1. **Build and Run**
    ```bash
    docker-compose up --build
    ```
-   - Access at `http://localhost:8000/`.
-   - View logs: `docker-compose logs web`.
-
-4. **Apply Migrations in Docker**
+2. **Apply Migrations**
    ```bash
    docker exec -it <web_container_id> python manage.py migrate
    docker exec -it <web_container_id> python manage.py createsuperuser
    ```
 
-5. **Stop Containers**
-   ```bash
-   docker-compose down
-   ```
+---
+
+### Client Setup (Windows)
+
+1. **Place `LocalApp.exe`**
+   - Copy `LocalApp.exe` to `C:\localapp\`.
+   - Ensure it’s compiled from `install_app.py` with `psycopg2` bundled:
+     ```bash
+     pyinstaller --onefile --console --hidden-import=psycopg2 install_app.py -n LocalApp
+     ```
+
+2. **Register Custom Protocol**
+   - Save as `myapp.reg`:
+     ```reg
+     Windows Registry Editor Version 5.00
+
+     [HKEY_CLASSES_ROOT\myapp]
+     @="URL:MyApp Protocol"
+     "URL Protocol"=""
+
+     [HKEY_CLASSES_ROOT\myapp\shell]
+     [HKEY_CLASSES_ROOT\myapp\shell\open]
+     [HKEY_CLASSES_ROOT\myapp\shell\open\command]
+     @="\"C:\\localapp\\LocalApp.exe\" \"%1\""
+     ```
+   - Double-click to import.
+
+3. **Set Up `install_app.bat`**
+   - Save in `C:\Users\<username>\install_app.bat`:
+     ```bat
+     @echo off
+     setlocal EnableDelayedExpansion
+
+     if "%~1"=="" (
+         echo Usage: %0 ^<app_name^>
+         exit /b 1
+     )
+
+     set "APP_NAME=%~1"
+     set "API_URL=http://localhost:8000/api/install/%APP_NAME%/"
+
+     echo Calling API for %APP_NAME%...
+     curl -X POST "%API_URL%" > response.json
+
+     for /f "tokens=*" %%i in ('powershell -Command "Get-Content response.json | ConvertFrom-Json | Select-Object -ExpandProperty install_url"') do (
+         set "INSTALL_URL=%%i"
+     )
+
+     if "!INSTALL_URL!"=="" (
+         echo Error: No install URL returned from API. Check response.json.
+         type response.json
+         exit /b 1
+     )
+
+     echo Triggering installation for %APP_NAME% with URL: !INSTALL_URL!...
+     "C:\localapp\LocalApp.exe" "!INSTALL_URL!"
+
+     del response.json
+     endlocal
+     ```
+   - Add to `PATH`:
+     - Move to `C:\Windows\System32\` (requires admin):
+       ```cmd
+       move C:\Users\<username>\install_app.bat C:\Windows\System32\
+       ```
+     - Or update `PATH`:
+       ```cmd
+       setx PATH "%PATH%;C:\Users\<username>"
+       ```
 
 ---
 
 ## Usage
 
 ### Frontend
-- **Browse Apps**: Visit `/app/<app_name>/` to view app details, screenshots, and purchase options.
-- **Purchase**: Click "Pay" to generate a WeChat QR code for paid apps. After payment, download and install buttons appear.
-- **Admin Panel**: Access `/management/admin/` (staff only) to add/edit apps.
+- **Browse Apps**: Visit `/app/<app_name>/` to view details and purchase.
+- **Install**: Click "安装" to trigger `myapp://install/<app_name>`, launching `LocalApp.exe`.
 
 ### API
-- **Endpoint**: `/api/install/<app_name>/`
-- **Method**: `POST`
-- **Authentication**: Token-based (optional)
-- **Example Request**:
-  ```bash
-  curl -X POST http://localhost:8000/api/install/Auto%20Revit%202022/ \
-       -H "Authorization: Token <your_token>"
+- **Command**: Open CMD and run:
+  ```cmd
+  install_app WeChat
   ```
-- **Response** (Success):
-  ```json
-  {
-    "status": "success",
-    "message": "Installation started for Auto Revit 2022",
-    "output": "<script output>"
-  }
-  ```
-- **Response** (Error):
-  ```json
-  {
-    "error": "Script execution failed",
-    "details": "<error message>"
-  }
-  ```
+- **Response**: Triggers `LocalApp.exe` to install `WeChat` from `\\10.20.1.201\apps\`.
 
-- **Generate Token**:
-  ```bash
-  python manage.py shell
-  ```
-  ```python
-  from rest_framework.authtoken.models import Token
-  from django.contrib.auth.models import User
-  user = User.objects.get(username='your_username')
-  token = Token.objects.create(user=user)
-  print(token.key)
-  ```
+### Admin
+- **Add Apps**: Log in at `/management/admin/` to upload apps with scripts.
 
 ---
 
-## Configuration
+## How It Works
 
-### Environment Variables
-Stored in `.env`:
-- `SECRET_KEY`: Django secret key.
-- `DEBUG`: Set to `True` for development, `False` for production.
-- `DATABASE_NAME`: SQLite database file (or configure PostgreSQL).
-- `ALLOWED_HOSTS`: Comma-separated list of allowed hosts.
-- `WECHAT_*`: WeChat payment credentials and certificate paths.
-
-### Settings
-- `MEDIA_ROOT`: Stores uploaded files (e.g., `/srv/AutoInstaller/media/` in Docker).
-- `LOGGING`: Logs to console and `debug.log` for debugging.
-
----
-
-## Development
-
-### Adding an App
-1. Log in as staff at `/management/login/`.
-2. Go to `/management/add-app/`.
-3. Upload a ZIP file containing the app script (e.g., `install.sh` or `install.bat`), icon, and screenshots.
-
-### Customizing Scripts
-- Scripts are stored in `App.script` (full path, e.g., `/srv/AutoInstaller/unzipped/<app_name>/install.sh`).
-- Ensure scripts are executable (`chmod +x install.sh` in Docker).
+1. **API Call**: `install_app <app_name>` calls `http://localhost:8000/api/install/<app_name>/`, returning `{"install_url": "myapp://install/<app_name>"}`.
+2. **Batch File**: `install_app.bat` extracts the `install_url` and runs `LocalApp.exe` with it.
+3. **LocalApp.exe**: Fetches the script path from `app_database` and executes it from `\\localhost\apps\`.
 
 ---
 
 ## Troubleshooting
 
-- **Payment Fails in Docker**:
-  - Check `debug.log` or `docker-compose logs web` for errors.
-  - Verify `Wechat_cert/` files are mounted (`ls -l /srv/AutoInstaller/Wechat_cert/` in container).
-  - Test WeChat API connectivity: Add `requests.get('https://api.weixin.qq.com/')` in `payment_view`.
+- **API Error**:
+  - Check `debug.log` for `No App matches the given query`.
+  - Add apps via `/management/admin/`.
 
-- **API Errors**:
-  - Ensure `App.script` paths are valid.
-  - Check logs for `Script not found` or execution errors.
+- **Install Fails**:
+  - Test: `C:\localapp\LocalApp.exe myapp://install/WeChat`.
+  - Verify `\\localhost\apps\<script_path>` accessibility.
+
+- **Command Not Found**:
+  - Ensure `install_app.bat` is in `PATH`:
+    ```cmd
+    echo %PATH%
+    ```
 
 ---
 
 ## Deployment
 
-For production:
-1. Set `DEBUG=False` in `.env`.
-2. Use a WSGI server (e.g., Gunicorn):
-   ```dockerfile
-   CMD ["gunicorn", "--bind", "0.0.0.0:8000", "AutoInstaller.wsgi:application"]
-   ```
-3. Configure HTTPS with Nginx and a certificate (e.g., Let’s Encrypt).
-4. Update `notify_url` in `payment_view` to your domain.
+- **Production**:
+  - Set `DEBUG=False` in `.env`.
+  - Use Gunicorn: `CMD ["gunicorn", "--bind", "0.0.0.0:8000", "AutoInstaller.wsgi:application"]` in `Dockerfile`.
+  - Secure with Nginx and HTTPS.
+
+- **Client**: Distribute `LocalApp.exe` and `install_app.bat` with instructions.
 
 ---
 
 ## Contributing
 
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/xyz`).
-3. Commit changes (`git commit -m "Add XYZ feature"`).
-4. Push to the branch (`git push origin feature/xyz`).
+1. Fork the repo.
+2. Create a branch (`git checkout -b feature/xyz`).
+3. Commit changes (`git commit -m "Add XYZ"').
+4. Push (`git push origin feature/xyz`).
 5. Open a Pull Request.
-
----
-
-### Notes on `.env`
-- **Why `.env`**: Replaces `config.py` for better security and flexibility. Use `python-decouple` to load `.env` variables in `settings.py`:
-  ```bash
-  pip install python-decouple
-  ```
-  ```python
-  # AutoInstaller/settings.py
-  from decouple import config
-
-  SECRET_KEY = config('SECRET_KEY')
-  DEBUG = config('DEBUG', default=False, cast=bool)
-  DATABASE_NAME = config('DATABASE_NAME')
-  ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
-  WECHAT_APP_ID = config('WECHAT_APP_ID')
-  WECHAT_API_KEY = config('WECHAT_API_KEY')
-  WECHAT_MCH_ID = config('WECHAT_MCH_ID')
-  WECHAT_MCH_CERT = config('WECHAT_MCH_CERT')
-  WECHAT_MCH_KEY = config('WECHAT_MCH_KEY')
-  ```

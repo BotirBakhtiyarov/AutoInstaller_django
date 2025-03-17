@@ -44,7 +44,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://apps.cec.cc',
+    '',
 ]
 
 INSTALLED_APPS = [
@@ -58,16 +58,24 @@ INSTALLED_APPS = [
     'django_extensions',
     'Management.apps.ManagementConfig',
     'rest_framework',
-    'rest_framework.authtoken',
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  # Restricts other APIs to authenticated users
-    ],
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'debug.log',
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'DEBUG',
+    },
 }
 
 
