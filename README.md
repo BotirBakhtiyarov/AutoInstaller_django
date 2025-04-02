@@ -203,7 +203,7 @@ AutoInstaller_for-company/
 ---
 
 ## Usage
-
+![Alt Text](static/diagram.png)
 ### Frontend
 - **Browse Apps**: Visit `/app/<app_name>/` to view details and purchase.
 - **Install**: Click "安装" to trigger `myapp://install/<app_name>`, launching `LocalApp.exe`.
