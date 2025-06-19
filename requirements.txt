@@ -14,5 +14,5 @@ packaging==24.2
 pycryptodome==3.21.0
 idna==3.10
 requests==2.32.3
-urllib3==2.3.0
+urllib3==2.5.0
 python-dotenv==1.0.1
